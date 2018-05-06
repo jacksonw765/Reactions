@@ -30,4 +30,15 @@
         android:text="0"
         android:textSize="40sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textCountdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/imageView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-89dp"
+        android:text="5"
+        android:textSize="50sp"
+        android:textStyle="bold" />
 </RelativeLayout>
