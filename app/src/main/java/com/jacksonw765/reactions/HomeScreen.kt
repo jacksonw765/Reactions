@@ -22,7 +22,6 @@ class HomeScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         supportActionBar!!.hide()
         setContentView(R.layout.activity_home_screen)
-        setupWindowAnimations()
         buttonStart = findViewById(R.id.buttonStart)
 
         buttonStart.setOnClickListener(object: View.OnClickListener {
@@ -31,11 +30,5 @@ class HomeScreen : AppCompatActivity() {
                startActivity(i)
             }
         })
-    }
-
-    private fun setupWindowAnimations() {
-        val explode = Explode()
-        explode.duration = 1000
-        window.exitTransition = explode
     }
 }

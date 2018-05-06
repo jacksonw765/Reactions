@@ -3,14 +3,10 @@ package com.jacksonw765.reactions
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Looper
 import java.util.*
 import android.util.DisplayMetrics
 import android.view.View
-import android.view.Window
-import android.transition.Fade
 import android.widget.*
-import android.R.raw
 import android.media.MediaPlayer
 
 
@@ -18,9 +14,11 @@ import android.media.MediaPlayer
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var button: ImageView
+    lateinit var buttonCoin: ImageView
+    lateinit var buttonGoomba: ImageView
     lateinit var layout: RelativeLayout
     lateinit var random: Random
+    lateinit var textTimerUI: TextView
     lateinit var textScore: TextView
     lateinit var textCountDown: TextView
 
@@ -39,49 +37,83 @@ class MainActivity : AppCompatActivity() {
         supportActionBar!!.hide()
         setContentView(R.layout.activity_main)
 
+        //find all resources from xml
         layout = findViewById(R.id.layout)
-        button = findViewById(R.id.imageView)
+        buttonCoin = findViewById(R.id.imageView)
         textScore = findViewById(R.id.textScore)
         textCountDown = findViewById(R.id.textCountdown)
+        buttonGoomba = findViewById(R.id.buttonGoomba)
+        textTimerUI = findViewById(R.id.textMainTimer)
         random = Random()
 
+        //get window manager to get the display resolution
         windowManager.defaultDisplay.getMetrics(displayMetrics)
 
+        //get screen resolution
         displayX = displayMetrics.widthPixels
         displayY = displayMetrics.heightPixels
 
+        textTimerUI.text = "0"
+
+        //give high low values for random gen
         heightLow = displayY * .18
         withLow =  displayX * .15
 
-        button.x = -1000f
-        button.y = -1000f
+        //place the buttonCoin off screen
+        buttonCoin.x = -1000f
+        buttonCoin.y = -1000f
+        buttonGoomba.x = -1000f
+        buttonGoomba.y = -1000f
 
         setupTimer()
     }
 
     private fun startGame() {
-        //while(isGameStarted) {
-            button.x = random.nextInt((displayMetrics.widthPixels)/2).toFloat()
-            button.y = random.nextInt((displayMetrics.heightPixels)/2).toFloat()
-            println("X is: " + button.x)
-            println("Y is: " + button.y)
+            buttonCoin.x = random.nextInt((displayMetrics.widthPixels)/2).toFloat()
+            buttonCoin.y = random.nextInt((displayMetrics.heightPixels)/2).toFloat()
+            println("X is: " + buttonCoin.x)
+            println("Y is: " + buttonCoin.y)
 
-            button.setOnClickListener(object: View.OnClickListener {
+            buttonCoin.setOnClickListener(object: View.OnClickListener {
                 override fun onClick(view: View?) {
                     ++score
-                    var randomx = random.nextInt((displayX - withLow.toInt())) + withLow.toFloat()
-                    var randomy = random.nextInt((displayY - heightLow.toInt())) + withLow.toFloat()
-                    println("*****$randomx")
-                    println("*****$randomy")
-                    button.x = randomx
-                    button.y = randomy
-                    println("X is: " + button.x)
-                    println("Y is: " + button.y)
+                    buttonCoin.x = generateRandomX()
+                    buttonCoin.y = generateRandomY()
                     textScore.text = ""+score
 
+                    //if button goomba is off screen
+                    if(buttonGoomba.x != -1000f) {
+                        buttonGoomba.x = -1000f
+                        buttonGoomba.y = -1000f
+                    }
+                    // 25% chance of generating enemy
+                    if((random.nextInt(4)+1) == 1) {
+                        generateEnemy()
+                    }
                 }
             })
-        //}
+    }
+
+    //generate enemy
+    private fun generateEnemy() {
+            buttonGoomba.x = generateRandomX()
+            buttonGoomba.y = generateRandomY()
+            buttonGoomba.setOnClickListener(object: View.OnClickListener {
+                override fun onClick(p0: View?) {
+                    score -= 5
+                    buttonGoomba.x = -1000f
+                    buttonGoomba.y = -1000f
+                    textScore.text = ""+score
+                }
+            } )
+    }
+
+    private fun generateRandomX(): Float {
+        return random.nextInt((displayX - withLow.toInt())) + withLow.toFloat()
+    }
+
+    private fun generateRandomY(): Float {
+        return random.nextInt((displayY - heightLow.toInt())) + withLow.toFloat()
     }
 
     private fun setupTimer() {
@@ -90,12 +122,13 @@ class MainActivity : AppCompatActivity() {
         val period: Long = 1000
         val timer = object : CountDownTimer(delay, period) {
                 override fun onFinish() {
+                    textCountDown.text = "Go!"
                     startGameTimer()
                 }
-
                 override fun onTick(millisUntilFinished: Long) {
+                    println("OnTickSetupTimer!!!!!")
                     if(millisUntilFinished < 1000) {
-                        textCountDown.text = ""+0
+
                     }
                     textCountDown.text = ""+(millisUntilFinished/1000).toInt()
                 }
@@ -107,17 +140,18 @@ class MainActivity : AppCompatActivity() {
     private fun startGameTimer() {
         val delay: Long = 1000
         val period: Long = 25000
-        val timer = object : CountDownTimer(delay, period) {
+        val timer2 = object : CountDownTimer(delay, period) {
             override fun onFinish() {
                 isGameStarted = false
             }
 
             override fun onTick(untilFinished: Long) {
-                textCountDown.text = "" + untilFinished
-
+                println("OnTickGameTimer!***********")
+                textTimerUI.text = "" + (untilFinished/1000).toInt()
             }
         }
-        timer.start()
+        textTimerUI.text = "25"
+        timer2.start()
         isGameStarted = true
         startGame()
     }
